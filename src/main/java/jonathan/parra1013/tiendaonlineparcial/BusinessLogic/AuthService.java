@@ -1,8 +1,8 @@
 package jonathan.parra1013.tiendaonlineparcial.BusinessLogic;
 
 import jonathan.parra1013.tiendaonlineparcial.Repositories.IUsersRepository;
+import org.mindrot.jbcrypt.BCrypt;
 
-import java.util.regex.Pattern;
 
 public class AuthService {
     IUsersRepository userRepo;
@@ -14,15 +14,9 @@ public class AuthService {
 
     }
 
-    //Function to registerUsers into the data base
+    //Function to register Users into the data base
     public String registerUser(User user) {
-
-        //validating the empty fields
-        if(user.getUsername().isEmpty() || user.getEmail().isEmpty() || user.getPassword().isEmpty()) {
-            return "One of the fields is empty";
-        }
-
-        //validating spaces
+        //validating spaces and empty spaces
         if(user.getUsername().isBlank() || user.getEmail().isBlank() || user.getPassword().isBlank()) {
             return "One of the fields is empty";
         }
@@ -33,9 +27,7 @@ public class AuthService {
 
         String username = user.getUsername();
         String email = user.getEmail();
-
-
-
+        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
         //validating if the username or the email already exists in the data base.
         if(userRepo.userExists(username)) {
             return "Username already exists";
@@ -43,7 +35,22 @@ public class AuthService {
         if(userRepo.emailExists(email)) {
             return "Email already exists";
         }
-        userRepo.saveUser(user);
+        userRepo.saveUser(new User.Builder(username, hashedPassword)
+                .email(email)
+                .role(Roles.Customer)
+                .build());
+
         return "User registered successfully";
+    }
+
+    //Login method. Accepts user
+    public String loginUser(User user) {
+        if(!userRepo.userExists(user.getUsername())){
+            return "user doesn't exist";
+        }
+        if (!BCrypt.checkpw(user.getPassword(), userRepo.getUser(user.getUsername()).getPassword())) {
+            return "Wrong password";
+        }
+        return "User logged successfully";
     }
 }

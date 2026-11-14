@@ -20,10 +20,11 @@ public class RegisterGUI {
         System.out.println("Add email: ");
         String email = sc.nextLine();
 
-        String state = auth.registerUser(new User.Builder(username, password, email)
+        String state = auth.registerUser(new User.Builder(username, password)
+                .email(email)
                 .role(Roles.Customer)
                 .build());
-        
+
         System.out.println(state);
     }
 }

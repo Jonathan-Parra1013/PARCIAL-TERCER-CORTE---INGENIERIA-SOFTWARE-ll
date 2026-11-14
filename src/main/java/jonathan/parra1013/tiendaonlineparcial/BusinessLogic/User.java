@@ -29,10 +29,14 @@ public class User {
         private String password;
         private String email;
         private Roles role;
-        public Builder(String username, String password, String email) {
+        public Builder(String username, String password) {
             this.username = username;
             this.password = password;
+
+        }
+        public Builder email(String email){
             this.email = email;
+            return this;
         }
         public Builder role(Roles role){
             this.role = role;
