@@ -12,7 +12,7 @@ public class AuthService {
 
     }
     /**
-     * registerUser is a function that is used to add new users. It validates the data firstly
+     * registerUser is a function that is used to add new users. It validates all the data firstly
      * before using it to be sure it is handling correct data.
      * BCrypt was used to ensure a better security relating to the passwords.
      * @param User
