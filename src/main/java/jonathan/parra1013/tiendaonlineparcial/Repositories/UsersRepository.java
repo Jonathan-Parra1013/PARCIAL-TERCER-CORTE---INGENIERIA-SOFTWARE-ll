@@ -1,5 +1,6 @@
 package jonathan.parra1013.tiendaonlineparcial.Repositories;
 
+import jonathan.parra1013.tiendaonlineparcial.BusinessLogic.Roles;
 import jonathan.parra1013.tiendaonlineparcial.BusinessLogic.User;
 
 import java.util.HashMap;
@@ -9,7 +10,8 @@ import java.util.Map;
 public class UsersRepository implements  IUsersRepository {
     Map<String, User> temp_users = new HashMap<String, User>();
     public UsersRepository() {
-        temp_users.put("admin", new User("admin", "admin", "adming@gmail.com"));
+        temp_users.put("seller", new User.Builder("seller", "123456", "seller@gmail.com")
+                .role(Roles.Seller).build());
     }
 
     @Override

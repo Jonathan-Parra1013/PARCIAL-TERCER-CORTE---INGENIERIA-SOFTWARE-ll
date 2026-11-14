@@ -1,6 +1,7 @@
 package jonathan.parra1013.tiendaonlineparcial.GUI;
 
 import jonathan.parra1013.tiendaonlineparcial.BusinessLogic.AuthService;
+import jonathan.parra1013.tiendaonlineparcial.BusinessLogic.Roles;
 import jonathan.parra1013.tiendaonlineparcial.BusinessLogic.User;
 
 import java.util.Scanner;
@@ -19,7 +20,10 @@ public class RegisterGUI {
         System.out.println("Add email: ");
         String email = sc.nextLine();
 
-        String state = auth.registerUser(new User(username, password, email));
+        String state = auth.registerUser(new User.Builder(username, password, email)
+                .role(Roles.Customer)
+                .build());
+        
         System.out.println(state);
     }
 }
