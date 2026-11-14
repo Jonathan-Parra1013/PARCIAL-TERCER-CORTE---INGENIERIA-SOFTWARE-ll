@@ -6,14 +6,15 @@ import jonathan.parra1013.tiendaonlineparcial.BusinessLogic.User;
 import java.util.HashMap;
 import java.util.Map;
 
-
+//At the moment the UserRepository handles data in memory.
+//TODO add the DataBase
 public class UsersRepository implements  IUsersRepository {
     Map<String, User> temp_users = new HashMap<String, User>();
     public UsersRepository() {
         temp_users.put("seller", new User.Builder("seller", "$2a$14$JhPUzHrzNhqIL1wSpMcJxe30bLe9qngR27t2hTvh54s9h5.8dcKWy")
                 .email("seller@gmail.com")
                 .role(Roles.Seller).build());
-    } //password admin123
+    } //password admin123 as a temporary user
 
     @Override
     public boolean userExists(String username) {

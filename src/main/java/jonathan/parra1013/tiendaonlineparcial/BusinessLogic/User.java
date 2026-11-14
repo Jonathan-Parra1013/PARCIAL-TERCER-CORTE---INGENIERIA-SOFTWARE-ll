@@ -20,9 +20,14 @@ public class User {
     public String getEmail() { return email; }
     public Roles getRole() { return role; }
 
-    /*
-    * Builder pattern was added because the User might grow of parameters, and fixing the code
-    * and the readability would be harder.
+    /**
+    * Builder pattern was added because the User class might grow on parameters,
+    * making the code harder to maintain. This way the code is scalable and easy to read.
+     * @param String username -Obligatory
+     *        String password -Obligatory
+     *        String email -Optional but may be null
+     *        Roles role -Optional but may be null
+     * @return A class User with the built methods
     * */
     public static class Builder{
         private String username;

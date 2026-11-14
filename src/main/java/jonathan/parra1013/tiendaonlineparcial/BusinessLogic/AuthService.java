@@ -5,22 +5,23 @@ import org.mindrot.jbcrypt.BCrypt;
 
 
 public class AuthService {
-    IUsersRepository userRepo;
 
-    /*Constructor to add the necessary dependencies:
-    * iusersRepository: dependency to store the data into the database*/
+    IUsersRepository userRepo;
     public AuthService(IUsersRepository iusersRepository) {
         this.userRepo = iusersRepository;
 
     }
-
-    //Function to register Users into the data base
+    /**
+     * registerUser is a function that is used to add new users. It validates the data firstly
+     * before using it to be sure it is handling correct data.
+     * BCrypt was used to ensure a better security relating to the passwords.
+     * @param User
+     * @return A string text indicating the state of the operation.
+     * */
     public String registerUser(User user) {
-        //validating spaces and empty spaces
         if(user.getUsername().isBlank() || user.getEmail().isBlank() || user.getPassword().isBlank()) {
             return "One of the fields is empty";
         }
-        //validating the email format
         if(!EmailValidator.isValid(user.getEmail())) {
             return "Email address is invalid";
         }
@@ -28,7 +29,6 @@ public class AuthService {
         String username = user.getUsername();
         String email = user.getEmail();
         String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-        //validating if the username or the email already exists in the data base.
         if(userRepo.userExists(username)) {
             return "Username already exists";
         }
@@ -42,8 +42,12 @@ public class AuthService {
 
         return "User registered successfully";
     }
-
-    //Login method. Accepts user
+    /**
+     * loginUser is a function that used to validate credentials and log in users.
+     * BCrypt was used to automatically validate hashed passwords.
+     * @param User
+     * @return A string text indicating the state of the operation.
+     * */
     public String loginUser(User user) {
         if(!userRepo.userExists(user.getUsername())){
             return "user doesn't exist";

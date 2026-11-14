@@ -7,10 +7,15 @@ import jonathan.parra1013.tiendaonlineparcial.BusinessLogic.User;
 import java.util.Scanner;
 
 public class RegisterGUI {
+
     AuthService auth;
     public RegisterGUI(AuthService auth) {
         this.auth = auth;
     }
+    /**
+     * The register GUI.
+     * TODO; Is just a simulation, the graphic interface isn't created yet
+     * */
     public void register(){
         Scanner sc = new Scanner(System.in);
         System.out.println("Add username: ");

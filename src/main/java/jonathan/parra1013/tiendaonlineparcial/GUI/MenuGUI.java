@@ -3,13 +3,14 @@ package jonathan.parra1013.tiendaonlineparcial.GUI;
 import java.util.Scanner;
 
 public class MenuGUI {
+    //Injecting the different GUIS, at this moments, we only have the login GUI and register GUi
     LoginGUI loginGUI;
     RegisterGUI registerGUI;
     public MenuGUI(LoginGUI loginGUI, RegisterGUI registerGUI) {
         this.loginGUI = loginGUI;
         this.registerGUI = registerGUI;
     }
-
+    
     public void run(){
         while (true){
             int choice = 0;
