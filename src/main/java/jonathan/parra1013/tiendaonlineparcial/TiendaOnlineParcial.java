@@ -5,6 +5,7 @@
 package jonathan.parra1013.tiendaonlineparcial;
 
 import jonathan.parra1013.tiendaonlineparcial.BusinessLogic.AuthService;
+import jonathan.parra1013.tiendaonlineparcial.BusinessLogic.SessionContext;
 import jonathan.parra1013.tiendaonlineparcial.GUI.LoginGUI;
 import jonathan.parra1013.tiendaonlineparcial.GUI.MenuGUI;
 import jonathan.parra1013.tiendaonlineparcial.GUI.RegisterGUI;
@@ -18,21 +19,23 @@ import jonathan.parra1013.tiendaonlineparcial.Repositories.UsersRepository;
 public class TiendaOnlineParcial {
     AuthService authService;
     IUsersRepository usersRepository;
+    SessionContext sessionContext;
     RegisterGUI  registerGUI;
     LoginGUI loginGUI;
     MenuGUI menuGUI;
+
     public static void main(String[] args) {
         TiendaOnlineParcial tienda = new TiendaOnlineParcial();
-        tienda.implementRegisterLayers();
+        tienda.implementLayers();
 
         tienda.menuGUI.run();
     }
 
-    private void implementRegisterLayers(){
+    private void implementLayers(){
         usersRepository = new UsersRepository();
-        authService = new AuthService(usersRepository);
+        authService = new AuthService(usersRepository, sessionContext);
         registerGUI = new RegisterGUI(authService);
         loginGUI = new LoginGUI(authService);
-        menuGUI = new MenuGUI(loginGUI, registerGUI);
+        menuGUI = new MenuGUI(loginGUI, registerGUI, sessionContext);
     }
 }

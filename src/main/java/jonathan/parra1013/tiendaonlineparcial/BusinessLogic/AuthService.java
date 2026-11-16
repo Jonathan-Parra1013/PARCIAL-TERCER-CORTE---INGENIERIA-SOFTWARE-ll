@@ -7,15 +7,16 @@ import org.mindrot.jbcrypt.BCrypt;
 public class AuthService {
 
     IUsersRepository userRepo;
-    public AuthService(IUsersRepository iusersRepository) {
+    SessionContext sessionContext;
+    public AuthService(IUsersRepository iusersRepository, SessionContext sessionContext) {
         this.userRepo = iusersRepository;
-
+        this.sessionContext = sessionContext;
     }
     /**
      * registerUser is a function that is used to add new users. It validates the data firstly
      * before using it to be sure it is handling correct data.
      * BCrypt was used to ensure a better security considering the passwords.
-     * @param User
+     * @param user
      * @return A string text indicating the state of the operation.
      * */
     public String registerUser(User user) {
@@ -45,7 +46,7 @@ public class AuthService {
     /**
      * loginUser is a function that used to validate credentials and log in users.
      * BCrypt was used to automatically validate hashed passwords.
-     * @param User
+     * @param user
      * @return A string text indicating the state of the operation.
      * */
     public String loginUser(User user) {
@@ -55,6 +56,7 @@ public class AuthService {
         if (!BCrypt.checkpw(user.getPassword(), userRepo.getUser(user.getUsername()).getPassword())) {
             return "Wrong password";
         }
+        sessionContext.setCurrentUser(user);
         return "User logged successfully";
     }
 }
