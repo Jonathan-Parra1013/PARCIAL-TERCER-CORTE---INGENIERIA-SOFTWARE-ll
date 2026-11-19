@@ -11,6 +11,7 @@ package jonathan.parra1013.parcialsoftwaresegundaversion;
 public class ParcialSoftwareSegundaVersion {
 
     public static void main(String[] args) {
-        PruebaDescuento.prueba();
+
+        Prueba.iniciar();
     }
 }
