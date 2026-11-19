@@ -1,12 +1,14 @@
 package LogicaNegocio;
 
 public class Usuario {
+    private final int id;
     private final String nombre;
     private final String email;
     private final String passwordHash;
-    private final Rol rol;
+    private final String rol;
 
-    public Usuario(String nombre, String email, String passwordHash, Rol rol) {
+    public Usuario(int id, String nombre, String email, String passwordHash, String rol) {
+        this.id = id;
         this.nombre = nombre;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -16,7 +18,7 @@ public class Usuario {
     public String getNombre() { return nombre; }
     public String getEmail() { return email; }
     public String getPasswordHash() { return passwordHash; }
-    public Rol getRol() { return rol; }
+    public String getRol() { return rol; }
 
     @Override
     public String toString() {

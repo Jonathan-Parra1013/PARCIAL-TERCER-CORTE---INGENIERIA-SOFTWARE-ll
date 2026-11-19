@@ -12,6 +12,6 @@ public class ParcialSoftwareSegundaVersion {
 
     public static void main(String[] args) {
 
-        Prueba.iniciar();
+       
     }
 }

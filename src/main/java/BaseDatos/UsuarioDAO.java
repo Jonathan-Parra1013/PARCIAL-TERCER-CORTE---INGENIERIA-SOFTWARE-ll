@@ -10,12 +10,13 @@ package BaseDatos;
  */
 
 
-import Modelo.Usuario;
+import LogicaNegocio.Usuario;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.mindrot.jbcrypt.BCrypt;
+
 
 public class UsuarioDAO {
 
@@ -41,14 +42,14 @@ public class UsuarioDAO {
 
     // creacion de cuenta de un usuario y se cifra la contraseña :b
     public boolean registrarUsuario(Usuario usuario) {
-        if (existeCorreo(usuario.getCorreo())) {
+        if (existeCorreo(usuario.getEmail())) {
             return false;
         }
         String sql = "INSERT INTO usuarios (nombre, correo, contrasena, rol) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            String hash = BCrypt.hashpw(usuario.getContrasena(), BCrypt.gensalt());
+            String hash = BCrypt.hashpw(usuario.getPasswordHash(), BCrypt.gensalt());
             ps.setString(1, usuario.getNombre());
-            ps.setString(2, usuario.getCorreo());
+            ps.setString(2, usuario.getEmail());
             ps.setString(3, hash);
             ps.setString(4, usuario.getRol());
             return ps.executeUpdate() > 0;
