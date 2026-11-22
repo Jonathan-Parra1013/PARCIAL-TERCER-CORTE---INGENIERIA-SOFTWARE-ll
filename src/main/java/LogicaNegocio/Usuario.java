@@ -1,5 +1,11 @@
 package LogicaNegocio;
 
+
+/**
+ *
+ * @author jonap
+ */
+
 public class Usuario {
     private final int id;
     private final String nombre;
@@ -14,7 +20,8 @@ public class Usuario {
         this.passwordHash = passwordHash;
         this.rol = rol;
     }
-
+    
+    public int getId() {return id; }
     public String getNombre() { return nombre; }
     public String getEmail() { return email; }
     public String getPasswordHash() { return passwordHash; }
