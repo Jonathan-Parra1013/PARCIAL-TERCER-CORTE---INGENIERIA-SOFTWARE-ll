@@ -1,4 +1,9 @@
 package BaseDatos;
+/**
+ *
+ * @author jonap
+ */
+
 
 import LogicaNegocio.Producto;
 import java.math.BigDecimal;
@@ -9,10 +14,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class ProductoDAO {
 
     private static final String SELECT_BASE =
-            "SELECT p.id_producto, p.nombre, p.precio, p.stock, c.nombre AS categoria "
+            "SELECT p.id_producto, p.nombre, p.descripcion, p.precio, p.stock, p.ruta_imagen, "
+          + "p.id_vendedor, p.activo, c.nombre AS categoria "
           + "FROM productos p JOIN categorias c ON p.id_categoria = c.id_categoria ";
 
     private final Connection con;
@@ -25,20 +32,23 @@ public class ProductoDAO {
         return new Producto(
                 rs.getInt("id_producto"),
                 rs.getString("nombre"),
+                rs.getString("descripcion"),
                 rs.getBigDecimal("precio"),
                 rs.getInt("stock"),
-                rs.getString("categoria"));
+                rs.getString("categoria"),
+                rs.getInt("id_vendedor"),
+                rs.getString("ruta_imagen"),
+                rs.getBoolean("activo"));
     }
 
-    // catálogo completo
+    // catálogo completo (solo productos activos)
     public List<Producto> listarTodos() {
         return filtrar(null, null, null, null);
     }
 
-
     public List<Producto> filtrar(String categoria, BigDecimal precioMin,
                                   BigDecimal precioMax, String texto) {
-        StringBuilder sql = new StringBuilder(SELECT_BASE).append("WHERE 1=1 ");
+        StringBuilder sql = new StringBuilder(SELECT_BASE).append("WHERE p.activo = 1 ");
         List<Object> params = new ArrayList<>();
 
         if (categoria != null && !categoria.isBlank()) {
@@ -75,7 +85,7 @@ public class ProductoDAO {
         return resultado;
     }
 
-    // null si no existe :D
+    // null si no existe :D 
     public Producto buscarPorId(int idProducto) {
         String sql = SELECT_BASE + "WHERE p.id_producto = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -91,15 +101,19 @@ public class ProductoDAO {
         return null;
     }
 
-// crear producto :b
+  
     public boolean crear(Producto producto) {
-        String sql = "INSERT INTO productos (nombre, precio, stock, id_categoria) "
-                   + "VALUES (?, ?, ?, (SELECT id_categoria FROM categorias WHERE nombre = ?))";
+        producto.validarParaPublicar();
+        String sql = "INSERT INTO productos (id_categoria, id_vendedor, nombre, descripcion, precio, stock, ruta_imagen) "
+                   + "VALUES ((SELECT id_categoria FROM categorias WHERE nombre = ?), ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, producto.getNombre());
-            ps.setBigDecimal(2, producto.getPrecio());
-            ps.setInt(3, producto.getStock());
-            ps.setString(4, producto.getCategoria());
+            ps.setString(1, producto.getCategoria());
+            ps.setInt(2, producto.getIdVendedor());
+            ps.setString(3, producto.getNombre());
+            ps.setString(4, producto.getDescripcion());
+            ps.setBigDecimal(5, producto.getPrecio());
+            ps.setInt(6, producto.getStock());
+            ps.setString(7, producto.getRutaImagen());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al crear producto: " + e.getMessage());
@@ -123,7 +137,7 @@ public class ProductoDAO {
 
 
     public boolean descontarStock(Connection conTransaccion, int idProducto, int cantidad) throws SQLException {
-        String sql = "UPDATE productos SET stock = stock - ? WHERE id_producto = ? AND stock >= ?";
+        String sql = "UPDATE productos SET stock = stock - ? WHERE id_producto = ? AND activo = 1 AND stock >= ?";
         try (PreparedStatement ps = conTransaccion.prepareStatement(sql)) {
             ps.setInt(1, cantidad);
             ps.setInt(2, idProducto);
