@@ -1,5 +1,6 @@
-package LogicaNegocio;
+package LogicaNegocio.Carrito;
 
+import LogicaNegocio.Producto;
 import LogicaNegocio.Producto;
 import java.math.BigDecimal;
 import java.util.ArrayList;

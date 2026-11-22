@@ -1,4 +1,4 @@
-package LogicaNegocio;
+package LogicaNegocio.Carrito;
 
 
 
@@ -8,9 +8,12 @@ package LogicaNegocio;
  */
 
 
+import LogicaNegocio.Carrito.CarritoException;
+import LogicaNegocio.Carrito.Carrito;
 import LogicaNegocio.Descuentos.CalculadoraDescuentos;
 import LogicaNegocio.Descuentos.Compra;
 import LogicaNegocio.Descuentos.ResultadoDescuento;
+import LogicaNegocio.Producto;
 import LogicaNegocio.Producto;
 import java.util.List;
 

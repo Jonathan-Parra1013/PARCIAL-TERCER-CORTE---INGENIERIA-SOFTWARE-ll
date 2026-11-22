@@ -1,4 +1,4 @@
-package LogicaNegocio;
+package LogicaNegocio.Carrito;
 /**
  *
  * @author jonap
