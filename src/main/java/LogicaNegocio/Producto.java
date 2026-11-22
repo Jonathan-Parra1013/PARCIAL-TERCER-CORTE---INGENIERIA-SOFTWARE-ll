@@ -1,12 +1,13 @@
 package LogicaNegocio;
 
-import java.math.BigDecimal;
 
 /**
- * Producto de la tienda. Valida las reglas de RF-04: nombre obligatorio,
- * precio mayor a cero y stock no negativo. Para un producto nuevo (aún sin
- * guardar) se usa id = 0; la base de datos asigna el id real.
+ *
+ * @author jonap
  */
+
+
+import java.math.BigDecimal;
 public class Producto {
     private final int id;
     private final String nombre;

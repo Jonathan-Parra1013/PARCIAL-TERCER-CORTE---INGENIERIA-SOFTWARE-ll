@@ -1,5 +1,11 @@
 package LogicaNegocio;
 
+
+/**
+ *
+ * @author jonap
+ */
+
 public class Usuario {
     private final int id;
     private final String nombre;
