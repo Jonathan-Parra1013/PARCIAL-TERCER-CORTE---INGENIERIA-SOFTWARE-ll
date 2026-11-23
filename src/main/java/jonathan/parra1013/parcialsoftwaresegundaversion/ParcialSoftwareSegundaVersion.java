@@ -4,6 +4,8 @@
 
 package jonathan.parra1013.parcialsoftwaresegundaversion;
 
+import GUI.LoginFrame;
+
 /**
  *
  * @author jonap
@@ -11,7 +13,8 @@ package jonathan.parra1013.parcialsoftwaresegundaversion;
 public class ParcialSoftwareSegundaVersion {
 
     public static void main(String[] args) {
-
+        System.out.println("prueba");
+        java.awt.EventQueue.invokeLater(() -> new LoginFrame().setVisible(true));
        
     }
 }
