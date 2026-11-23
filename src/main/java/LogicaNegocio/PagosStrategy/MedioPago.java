@@ -1,4 +1,6 @@
-package LogicaNegocio.Pedido;
+package LogicaNegocio.PagosStrategy;
+
+import LogicaNegocio.Pedido.EstadoPedido;
 
 /**
  *

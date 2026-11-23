@@ -5,6 +5,9 @@ package LogicaNegocio.Pedido;
  * @author jonap
  */
 
+import LogicaNegocio.PagosStrategy.MedioPago;
+import LogicaNegocio.Pedido.EstadoPedido;
+import LogicaNegocio.Pedido.DetallePedido;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

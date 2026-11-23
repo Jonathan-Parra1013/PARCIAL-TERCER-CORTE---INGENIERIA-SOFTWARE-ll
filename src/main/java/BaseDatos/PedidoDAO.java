@@ -8,7 +8,7 @@ package BaseDatos;
 
 import LogicaNegocio.Pedido.DetallePedido;
 import LogicaNegocio.Pedido.EstadoPedido;
-import LogicaNegocio.Pedido.MedioPago;
+import LogicaNegocio.PagosStrategy.MedioPago;
 import LogicaNegocio.Pedido.Pedido;
 import LogicaNegocio.Pedido.PedidoException;
 import java.sql.Connection;
