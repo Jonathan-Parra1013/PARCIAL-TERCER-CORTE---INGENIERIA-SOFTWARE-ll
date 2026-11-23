@@ -3,7 +3,6 @@ package LogicaNegocio.PagosStrategy;
 import LogicaNegocio.PagosStrategy.FormatoDinero;
 import LogicaNegocio.PagosStrategy.DatosPago;
 import LogicaNegocio.PagosStrategy.MedioPago;
-import LogicaNegocio.ResultadoPago;
 import java.math.BigDecimal;
 
 /**
