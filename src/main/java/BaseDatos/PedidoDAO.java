@@ -6,11 +6,11 @@ package BaseDatos;
  */
 
 
-import LogicaNegocio.DetallePedido;
-import LogicaNegocio.EstadoPedido;
-import LogicaNegocio.MedioPago;
-import LogicaNegocio.Pedido;
-import LogicaNegocio.PedidoException;
+import LogicaNegocio.Pedidos.DetallePedido;
+import LogicaNegocio.Pedidos.EstadoPedido;
+import LogicaNegocio.Pedidos.MedioPago;
+import LogicaNegocio.Pedidos.Pedido;
+import LogicaNegocio.Pedidos.PedidoException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

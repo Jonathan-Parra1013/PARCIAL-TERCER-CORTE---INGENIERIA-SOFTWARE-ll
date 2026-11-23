@@ -1,4 +1,4 @@
-package LogicaNegocio;
+package LogicaNegocio.Pedidos;
 
 import java.math.BigDecimal;
 
