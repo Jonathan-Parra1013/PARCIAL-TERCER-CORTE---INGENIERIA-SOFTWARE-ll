@@ -29,16 +29,17 @@ public class ProductoDAO {
     }
 
     private Producto mapear(ResultSet rs) throws SQLException {
-        return new Producto(
+        return new Producto.Builder(
                 rs.getInt("id_producto"),
                 rs.getString("nombre"),
-                rs.getString("descripcion"),
                 rs.getBigDecimal("precio"),
-                rs.getInt("stock"),
-                rs.getString("categoria"),
-                rs.getInt("id_vendedor"),
-                rs.getString("ruta_imagen"),
-                rs.getBoolean("activo"));
+                rs.getInt("stock"))
+                .descripcion(rs.getString("descripcion"))
+                .categoria(rs.getString("categoria"))
+                .idVendedor(rs.getInt("id_vendedor"))
+                .rutaImagen(rs.getString("ruta_imagen"))
+                .activo(rs.getBoolean("activo"))
+                .build();
     }
 
     // catálogo completo (solo productos activos)
