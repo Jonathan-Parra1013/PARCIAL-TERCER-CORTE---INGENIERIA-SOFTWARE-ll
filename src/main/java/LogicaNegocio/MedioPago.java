@@ -1,5 +1,7 @@
 package LogicaNegocio;
 
+import LogicaNegocio.Pedido.EstadoPedido;
+
 /**
  *
  * @author jonap
