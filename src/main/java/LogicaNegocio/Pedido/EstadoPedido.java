@@ -1,4 +1,4 @@
-package LogicaNegocio.Pedidos;
+package LogicaNegocio.Pedido;
 /**
  *
  * @author jonap
