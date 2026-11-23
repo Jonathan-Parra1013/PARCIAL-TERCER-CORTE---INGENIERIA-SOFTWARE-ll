@@ -1,6 +1,10 @@
-package LogicaNegocio.Pagos;
+package LogicaNegocio;
 
-/** Resultado de intentar un pago: aprobado o rechazado, con un mensaje listo para mostrar. */
+/**
+ *
+ * @author jonap
+ */
+
 public class ResultadoPago {
     private final boolean aprobado;
     private final String referencia; // solo si fue aprobado

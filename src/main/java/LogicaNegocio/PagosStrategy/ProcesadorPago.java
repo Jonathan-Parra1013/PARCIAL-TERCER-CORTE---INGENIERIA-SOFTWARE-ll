@@ -1,6 +1,8 @@
-package LogicaNegocio;
+package LogicaNegocio.PagosStrategy;
 
-import LogicaNegocio.MedioPago;
+import LogicaNegocio.PagosStrategy.DatosPago;
+import LogicaNegocio.PagosStrategy.MedioPago;
+import LogicaNegocio.ResultadoPago;
 import java.math.BigDecimal;
 /**
  *

@@ -1,6 +1,9 @@
-package LogicaNegocio;
+package LogicaNegocio.PagosStrategy;
 
-import LogicaNegocio.MedioPago;
+import LogicaNegocio.PagosStrategy.FormatoDinero;
+import LogicaNegocio.PagosStrategy.DatosPago;
+import LogicaNegocio.PagosStrategy.MedioPago;
+import LogicaNegocio.ResultadoPago;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
