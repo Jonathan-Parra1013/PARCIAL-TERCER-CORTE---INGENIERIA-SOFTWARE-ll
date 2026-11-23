@@ -21,36 +21,33 @@ public class Producto {
     private final String rutaImagen;
     private final boolean activo;
 
-    public Producto(int id, String nombre, BigDecimal precio, int stock, String categoria) {
-        this(id, nombre, null, precio, stock, categoria, 0, null, true);
-    }
-
-    public Producto(int id, String nombre, String descripcion, BigDecimal precio, int stock,
-                    String categoria, int idVendedor, String rutaImagen, boolean activo) {
-        if (nombre == null || nombre.isBlank()) {
+    // Constructor privado: obliga a crear instancias mediante el Builder
+    private Producto(Builder builder) {
+        if (builder.nombre == null || builder.nombre.isBlank()) {
             throw new IllegalArgumentException("El nombre es obligatorio.");
         }
-        if (nombre.trim().length() > 120) {
+        if (builder.nombre.trim().length() > 120) {
             throw new IllegalArgumentException("El nombre es demasiado largo (máximo 120 caracteres).");
         }
-        if (precio == null || precio.signum() <= 0) {
+        if (builder.precio == null || builder.precio.signum() <= 0) {
             throw new IllegalArgumentException("El precio debe ser mayor a cero.");
         }
-        if (stock < 0) {
+        if (builder.stock < 0) {
             throw new IllegalArgumentException("El stock no puede ser negativo.");
         }
-        if (categoria == null || categoria.isBlank()) {
+        if (builder.categoria == null || builder.categoria.isBlank()) {
             throw new IllegalArgumentException("Debe seleccionar una categoría.");
         }
-        this.id = id;
-        this.nombre = nombre.trim();
-        this.descripcion = descripcion;
-        this.precio = precio;
-        this.stock = stock;
-        this.categoria = categoria.trim();
-        this.idVendedor = idVendedor;
-        this.rutaImagen = rutaImagen;
-        this.activo = activo;
+
+        this.id = builder.id;
+        this.nombre = builder.nombre.trim();
+        this.descripcion = builder.descripcion;
+        this.precio = builder.precio;
+        this.stock = builder.stock;
+        this.categoria = builder.categoria.trim();
+        this.idVendedor = builder.idVendedor;
+        this.rutaImagen = builder.rutaImagen;
+        this.activo = builder.activo;
     }
 
     public void validarParaPublicar() {
@@ -62,6 +59,17 @@ public class Producto {
         }
     }
 
+    // Devuelve un Builder precargado con los datos actuales para clonar y modificar
+    public Builder toBuilder() {
+        return new Builder(this.id, this.nombre, this.precio, this.stock)
+                .descripcion(this.descripcion)
+                .categoria(this.categoria)
+                .idVendedor(this.idVendedor)
+                .rutaImagen(this.rutaImagen)
+                .activo(this.activo);
+    }
+
+    // Getters
     public int getId() { return id; }
     public String getNombre() { return nombre; }
     public String getDescripcion() { return descripcion; }
@@ -71,4 +79,78 @@ public class Producto {
     public int getIdVendedor() { return idVendedor; }
     public String getRutaImagen() { return rutaImagen; }
     public boolean isActivo() { return activo; }
+
+    // Clase interna estática Builder
+    public static class Builder {
+        // Campos obligatorios
+        private int id;
+        private String nombre;
+        private BigDecimal precio;
+        private int stock;
+
+        // Campos opcionales con valores predeterminados
+        private String descripcion = null;
+        private String categoria = "General";
+        private int idVendedor = 0;
+        private String rutaImagen = null;
+        private boolean activo = true;
+
+        // Constructor con los datos obligatorios
+        public Builder(int id, String nombre, BigDecimal precio, int stock) {
+            this.id = id;
+            this.nombre = nombre;
+            this.precio = precio;
+            this.stock = stock;
+        }
+
+        // Métodos opcionales (también permiten editar los obligatorios en toBuilder)
+        public Builder id(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder nombre(String nombre) {
+            this.nombre = nombre;
+            return this;
+        }
+
+        public Builder precio(BigDecimal precio) {
+            this.precio = precio;
+            return this;
+        }
+
+        public Builder stock(int stock) {
+            this.stock = stock;
+            return this;
+        }
+
+        public Builder descripcion(String descripcion) {
+            this.descripcion = descripcion;
+            return this;
+        }
+
+        public Builder categoria(String categoria) {
+            this.categoria = categoria;
+            return this;
+        }
+
+        public Builder idVendedor(int idVendedor) {
+            this.idVendedor = idVendedor;
+            return this;
+        }
+
+        public Builder rutaImagen(String rutaImagen) {
+            this.rutaImagen = rutaImagen;
+            return this;
+        }
+
+        public Builder activo(boolean activo) {
+            this.activo = activo;
+            return this;
+        }
+
+        public Producto build() {
+            return new Producto(this);
+        }
+    }
 }
