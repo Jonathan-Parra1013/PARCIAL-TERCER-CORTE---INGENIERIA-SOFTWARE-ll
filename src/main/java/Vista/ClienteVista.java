@@ -7,6 +7,7 @@ package Vista;
 import LogicaNegocio.Carrito.CarritoException;
 import LogicaNegocio.Carrito.CarritoService;
 import LogicaNegocio.Moneda;
+import LogicaNegocio.Pedido.PedidoService;
 import LogicaNegocio.Producto.Producto;
 import LogicaNegocio.Producto.ProductoService;
 import LogicaNegocio.Usuario;
@@ -36,6 +37,7 @@ public class ClienteVista extends javax.swing.JFrame {
     private final UsuarioService usuarioService;
     private final ProductoService productoService;
     private final CarritoService carritoService;
+    private final PedidoService pedidoService;
 
     private final DefaultTableModel modelo = new DefaultTableModel(
             new Object[][]{}, new String[]{"PRODUCTO", "STOCK", "PRECIO"}) {
@@ -48,11 +50,13 @@ public class ClienteVista extends javax.swing.JFrame {
     private CarritoVista ventanaCarrito; // la ventana del carrito (una sola a la vez)
 
     public ClienteVista(Usuario cliente, UsuarioService usuarioService,
-                        ProductoService productoService, CarritoService carritoService) {
+                        ProductoService productoService, CarritoService carritoService,
+                        PedidoService pedidoService) {
         this.cliente = cliente;
         this.usuarioService = usuarioService;
         this.productoService = productoService;
         this.carritoService = carritoService;
+        this.pedidoService = pedidoService;
         initComponents();
         configurar();
         setLocationRelativeTo(null);
@@ -85,12 +89,20 @@ public class ClienteVista extends javax.swing.JFrame {
 
         CarritoBoton.addActionListener(e -> abrirCarrito());
         AGREGARCARRITO.addActionListener(this::AgregarCarritoActionPerformed);
+
+        // al volver a esta ventana (por ejemplo tras pagar) el stock se muestra actualizado
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowActivated(java.awt.event.WindowEvent e) {
+                cargarProductos();
+            }
+        });
     }
 
     // El carrito es una ventana propia y no modal: se abre una sola, y si ya está abierta se trae al frente
     private void abrirCarrito() {
         if (ventanaCarrito == null || !ventanaCarrito.isDisplayable()) {
-            ventanaCarrito = new CarritoVista(this, carritoService);
+            ventanaCarrito = new CarritoVista(this, carritoService, cliente, pedidoService, this::cargarProductos);
         }
         ventanaCarrito.setVisible(true);
         ventanaCarrito.toFront();
@@ -106,6 +118,8 @@ public class ClienteVista extends javax.swing.JFrame {
     }
 
     private void cargarProductos() {
+        int filaPrevia = jTable1.getSelectedRow();
+        int idPrevio = (filaPrevia >= 0 && filaPrevia < productos.size()) ? productos.get(filaPrevia).getId() : -1;
         String categoria = (String) FiltroProductos.getSelectedItem();
         if (categoria == null || TODAS.equals(categoria)) {
             categoria = null;
@@ -114,6 +128,13 @@ public class ClienteVista extends javax.swing.JFrame {
         modelo.setRowCount(0);
         for (Producto p : productos) {
             modelo.addRow(new Object[]{p.getNombre(), p.getStock(), Moneda.pesos(p.getPrecio())});
+        }
+        // conserva el producto elegido si sigue en la lista
+        for (int i = 0; i < productos.size(); i++) {
+            if (productos.get(i).getId() == idPrevio) {
+                jTable1.setRowSelectionInterval(i, i);
+                return;
+            }
         }
         mostrarSeleccion();
     }

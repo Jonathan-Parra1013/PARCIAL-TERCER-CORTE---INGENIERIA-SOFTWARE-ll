@@ -8,6 +8,8 @@ import LogicaNegocio.Carrito.CarritoException;
 import LogicaNegocio.Carrito.CarritoService;
 import LogicaNegocio.Carrito.ItemCarrito;
 import LogicaNegocio.Moneda;
+import LogicaNegocio.Pedido.PedidoService;
+import LogicaNegocio.Usuario;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
@@ -31,13 +33,17 @@ public class CarritoVista extends javax.swing.JFrame {
         }
     };
     private String ultimaInstantanea = "";
+    private final Usuario cliente;
+    private final PedidoService pedidos;
+    private final Runnable alComprar; // se ejecuta cuando la compra se confirma (refresca el catálogo)
 
-    /**
-     * @param padre   ventana desde la que se abre (para centrar esta encima); puede ser null
-     * @param carrito el carrito del cliente
-     */
-    public CarritoVista(java.awt.Component padre, CarritoService carrito) {
+  
+    public CarritoVista(java.awt.Component padre, CarritoService carrito,
+                        Usuario cliente, PedidoService pedidos, Runnable alComprar) {
         this.carrito = carrito;
+        this.cliente = cliente;
+        this.pedidos = pedidos;
+        this.alComprar = alComprar;
         initComponents();
         configurar();
         setLocationRelativeTo(padre);
@@ -156,6 +162,7 @@ public class CarritoVista extends javax.swing.JFrame {
         BotonQuitarProducto = new javax.swing.JButton();
         EspacioVaciar = new javax.swing.JButton();
         BotonCerrar = new javax.swing.JButton();
+        BotonPagar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -200,6 +207,9 @@ public class CarritoVista extends javax.swing.JFrame {
         BotonCerrar.setText("CERRAR");
         BotonCerrar.addActionListener(this::BotonCerrarActionPerformed);
 
+        BotonPagar.setText("PAGAR");
+        BotonPagar.addActionListener(this::BotonPagarActionPerformed);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -210,38 +220,40 @@ public class CarritoVista extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(21, 21, 21)
-                        .addComponent(EspacioProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(48, 48, 48)
-                        .addComponent(EspacioCantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(48, 48, 48)
-                        .addComponent(EspacioPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(179, 179, 179)
                         .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(BotonCerrar)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 94, Short.MAX_VALUE)
+                        .addComponent(BotonCerrar))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(23, 23, 23)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(12, 12, 12)
+                                .addComponent(jLabel2)
+                                .addGap(82, 82, 82)
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(32, 32, 32))
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addGap(11, 11, 11)
+                                    .addComponent(BotonCambiarCantidad)
+                                    .addGap(48, 48, 48)
+                                    .addComponent(BotonQuitarProducto))
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addGap(106, 106, 106)
+                                    .addComponent(EspacioVaciar))
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addComponent(EspacioProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(48, 48, 48)
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(BotonPagar)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                            .addComponent(EspacioCantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGap(48, 48, 48)
+                                            .addComponent(EspacioPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))))))))
                 .addContainerGap())
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(33, 33, 33)
-                .addComponent(jLabel2)
-                .addGap(82, 82, 82)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(72, 72, 72))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(32, 32, 32)
-                        .addComponent(BotonCambiarCantidad)
-                        .addGap(48, 48, 48)
-                        .addComponent(BotonQuitarProducto))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(127, 127, 127)
-                        .addComponent(EspacioVaciar)))
-                .addContainerGap(40, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -255,7 +267,9 @@ public class CarritoVista extends javax.swing.JFrame {
                         .addComponent(BotonCerrar)))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                .addComponent(BotonPagar)
+                .addGap(26, 26, 26)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(jLabel3)
@@ -271,7 +285,7 @@ public class CarritoVista extends javax.swing.JFrame {
                     .addComponent(BotonQuitarProducto))
                 .addGap(29, 29, 29)
                 .addComponent(EspacioVaciar)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addGap(38, 38, 38))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -282,7 +296,9 @@ public class CarritoVista extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -354,9 +370,25 @@ public class CarritoVista extends javax.swing.JFrame {
         BotonCambiarCantidad.doClick(); // Enter en CANTIDAD = pulsar CAMBIAR CANTIDAD
     }//GEN-LAST:event_EspacioCantidadActionPerformed
 
+    private void BotonPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonPagarActionPerformed
+        if (carrito.estaVacio()) {
+            aviso("Tu carrito está vacío. Agrega productos antes de pagar.", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        PagoVista pago = new PagoVista(this, cliente, pedidos);
+        pago.setVisible(true); // es modal: sigue aquí cuando se cierra
+        if (pago.isCompraRealizada()) {
+            alComprar.run(); // el catálogo recarga el stock
+            dispose();       // el carrito quedó vacío
+        } else {
+            refrescar();
+        }
+    }//GEN-LAST:event_BotonPagarActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BotonCambiarCantidad;
     private javax.swing.JButton BotonCerrar;
+    private javax.swing.JButton BotonPagar;
     private javax.swing.JButton BotonQuitarProducto;
     private javax.swing.JTextField EspacioCantidad;
     private javax.swing.JTextField EspacioPrecio;

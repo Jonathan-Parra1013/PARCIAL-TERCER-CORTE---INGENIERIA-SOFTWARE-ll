@@ -22,7 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 
 
-public class PedidoDAO {
+public class PedidoDAO implements LogicaNegocio.Pedido.PedidoRepositorio {
 
     // el subtotal no es una columna: se calcula sumando los detalles del pedido
     private static final String SELECT_PEDIDO =

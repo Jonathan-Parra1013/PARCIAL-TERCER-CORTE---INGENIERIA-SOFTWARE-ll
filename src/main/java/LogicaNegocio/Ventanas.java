@@ -1,5 +1,6 @@
 package LogicaNegocio;
 
+import BaseDatos.PedidoDAO;
 import BaseDatos.ProductoDAO;
 import BaseDatos.ReporteDAO;
 import LogicaNegocio.Carrito.CarritoService;
@@ -8,6 +9,11 @@ import LogicaNegocio.Descuentos.DescuentoClienteFrecuente;
 import LogicaNegocio.Descuentos.DescuentoPorCupon;
 import LogicaNegocio.Descuentos.DescuentoPorMonto;
 import LogicaNegocio.Descuentos.DescuentoPorVolumen;
+import LogicaNegocio.PagosStrategy.PagoContraEntrega;
+import LogicaNegocio.PagosStrategy.PagoTarjeta;
+import LogicaNegocio.PagosStrategy.PagoTransferencia;
+import LogicaNegocio.PagosStrategy.PasarelaPagos;
+import LogicaNegocio.Pedido.PedidoService;
 import LogicaNegocio.Producto.ProductoService;
 import LogicaNegocio.Reportes.ReporteService;
 import LogicaNegocio.Usuario;
@@ -34,9 +40,10 @@ public final class Ventanas {
                     new ProductoService(new ProductoDAO()),
                     new ReporteService(new ReporteDAO()));
         } else if (UsuarioService.ROL_CLIENTE.equalsIgnoreCase(usuario.getRol())) {
+            CarritoService carrito = new CarritoService(crearCalculadoraDescuentos());
+            PedidoService pedidos = new PedidoService(carrito, crearPasarela(), new PedidoDAO());
             ventana = new ClienteVista(usuario, usuarioService,
-                    new ProductoService(new ProductoDAO()),
-                    new CarritoService(crearCalculadoraDescuentos()));
+                    new ProductoService(new ProductoDAO()), carrito, pedidos);
         } else {
             JOptionPane.showMessageDialog(null, "Tu cuenta tiene un rol sin pantalla asignada: " + usuario.getRol(),
                     "Tienda online", JOptionPane.WARNING_MESSAGE);
@@ -52,6 +59,11 @@ public final class Ventanas {
         IngresarVista login = new IngresarVista(usuarioService);
         login.setVisible(true);
         actual.dispose();
+    }
+
+    // las tres estrategias de pago (patrón Strategy) disponibles en la tienda
+    private static PasarelaPagos crearPasarela() {
+        return new PasarelaPagos(List.of(new PagoTarjeta(), new PagoTransferencia(), new PagoContraEntrega()));
     }
 
     private static CalculadoraDescuentos crearCalculadoraDescuentos() {

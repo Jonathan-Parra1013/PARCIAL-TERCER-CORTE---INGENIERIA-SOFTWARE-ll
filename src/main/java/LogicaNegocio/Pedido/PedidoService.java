@@ -76,6 +76,11 @@ public class PedidoService {
         return pedido;
     }
 
+    /** Medios de pago que ofrece la pasarela (para el combo de la pantalla de pago). */
+    public List<MedioPago> mediosDePago() {
+        return pasarela.getMediosDisponibles();
+    }
+
     private void validarCliente(Usuario cliente) {
         if (cliente == null) {
             throw new PedidoException("Debes iniciar sesión para comprar.");
