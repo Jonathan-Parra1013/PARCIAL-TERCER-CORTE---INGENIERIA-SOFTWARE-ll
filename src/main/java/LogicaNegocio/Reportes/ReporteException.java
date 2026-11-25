@@ -1,0 +1,7 @@
+package LogicaNegocio.Reportes;
+
+public class ReporteException extends RuntimeException {
+    public ReporteException(String mensaje) {
+        super(mensaje);
+    }
+}

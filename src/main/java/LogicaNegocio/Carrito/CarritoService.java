@@ -13,8 +13,9 @@ import LogicaNegocio.Carrito.Carrito;
 import LogicaNegocio.Descuentos.CalculadoraDescuentos;
 import LogicaNegocio.Descuentos.Compra;
 import LogicaNegocio.Descuentos.ResultadoDescuento;
-import LogicaNegocio.Producto;
-import LogicaNegocio.Producto;
+import LogicaNegocio.Producto.Producto;
+import LogicaNegocio.Producto.Producto;
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -37,6 +38,8 @@ public class CarritoService {
     public boolean estaVacio() { return carrito.estaVacio(); }
 
     public List<ItemCarrito> getItems() { return carrito.getItems(); }
+
+    public BigDecimal getSubtotal() { return carrito.getSubtotal(); }
 
   
     public ResultadoDescuento resumen(int comprasPrevias, String cupon) {

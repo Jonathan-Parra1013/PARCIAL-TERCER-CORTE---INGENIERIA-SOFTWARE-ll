@@ -9,10 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Genera un PDF de texto simple sin librerías externas (Helvetica, A4).
- * Soporta varias páginas y tildes (codificación WinAnsi / windows-1252).
- */
+
 public class ExportadorPDF implements ExportadorReporte {
 
     private static final int LINEAS_POR_PAGINA = 45;

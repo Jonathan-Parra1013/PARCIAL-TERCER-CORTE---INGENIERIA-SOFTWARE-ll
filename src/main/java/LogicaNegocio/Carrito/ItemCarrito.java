@@ -1,7 +1,7 @@
 package LogicaNegocio.Carrito;
 
-import LogicaNegocio.Producto;
-import LogicaNegocio.Producto;
+import LogicaNegocio.Producto.Producto;
+import LogicaNegocio.Producto.Producto;
 import java.math.BigDecimal;
 
 //  un producto y cuántas unidades lleva el cliente :b

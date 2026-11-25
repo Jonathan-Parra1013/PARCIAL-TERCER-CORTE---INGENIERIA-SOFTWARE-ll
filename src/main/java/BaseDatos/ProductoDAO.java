@@ -5,7 +5,7 @@ package BaseDatos;
  */
 
 
-import LogicaNegocio.Producto;
+import LogicaNegocio.Producto.Producto;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ProductoDAO {
+public class ProductoDAO implements Repositorios.ProductoRepositorio {
 
     private static final String SELECT_BASE =
             "SELECT p.id_producto, p.nombre, p.descripcion, p.precio, p.stock, p.ruta_imagen, "
@@ -118,6 +118,61 @@ public class ProductoDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al crear producto: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // productos activos de un vendedor (para su panel de administración)
+    @Override
+    public List<Producto> listarPorVendedor(int idVendedor) {
+        String sql = SELECT_BASE + "WHERE p.id_vendedor = ? AND p.activo = 1 ORDER BY p.nombre";
+        List<Producto> resultado = new ArrayList<>();
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idVendedor);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    resultado.add(mapear(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error listando productos del vendedor: " + e.getMessage());
+        }
+        return resultado;
+    }
+
+    // solo modifica si el producto es del vendedor y sigue activo
+    @Override
+    public boolean actualizar(Producto producto) {
+        producto.validarParaPublicar();
+        String sql = "UPDATE productos SET id_categoria = (SELECT id_categoria FROM categorias WHERE nombre = ?), "
+                   + "nombre = ?, descripcion = ?, precio = ?, stock = ?, ruta_imagen = ? "
+                   + "WHERE id_producto = ? AND id_vendedor = ? AND activo = 1";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, producto.getCategoria());
+            ps.setString(2, producto.getNombre());
+            ps.setString(3, producto.getDescripcion());
+            ps.setBigDecimal(4, producto.getPrecio());
+            ps.setInt(5, producto.getStock());
+            ps.setString(6, producto.getRutaImagen());
+            ps.setInt(7, producto.getId());
+            ps.setInt(8, producto.getIdVendedor());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar producto: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // baja lógica (activo = 0): los pedidos antiguos siguen apuntando al producto
+    @Override
+    public boolean desactivar(int idProducto, int idVendedor) {
+        String sql = "UPDATE productos SET activo = 0 WHERE id_producto = ? AND id_vendedor = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idProducto);
+            ps.setInt(2, idVendedor);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al eliminar producto: " + e.getMessage());
             return false;
         }
     }
