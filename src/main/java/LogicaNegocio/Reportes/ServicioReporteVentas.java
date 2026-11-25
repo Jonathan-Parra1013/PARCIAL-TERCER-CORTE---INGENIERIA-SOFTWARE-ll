@@ -23,7 +23,7 @@ public class ServicioReporteVentas {
         this.ventaDAO = ventaDAO;
     }
 
-    /** Reporte de hoy: ingresos, número de ventas y productos vendidos. */
+
     public ReporteDiario generarReporteDelDia() {
         return generarReporte(LocalDate.now(ZONA));
     }
@@ -35,7 +35,7 @@ public class ServicioReporteVentas {
         LocalDateTime desde = fecha.atStartOfDay();
         LocalDateTime hasta = fecha.plusDays(1).atStartOfDay();
 
-        // Sin ventas: 0 pedidos, $0.00 y lista vacía (el DAO nunca devuelve null)
+
         return new ReporteDiario(
                 fecha,
                 ventaDAO.contarVentas(desde, hasta),
@@ -43,7 +43,7 @@ public class ServicioReporteVentas {
                 ventaDAO.productosVendidos(desde, hasta));
     }
 
-    /** Escribe el reporte en el archivo indicado con el formato (Strategy) elegido. */
+
     public Path exportar(ReporteDiario reporte, ExportadorReporte exportador, Path archivo) throws IOException {
         if (reporte == null || exportador == null || archivo == null) {
             throw new IllegalArgumentException("Reporte, exportador y archivo son obligatorios");
@@ -55,7 +55,7 @@ public class ServicioReporteVentas {
         return archivo;
     }
 
-    /** Nombre por defecto, útil para JFileChooser: reporte_ventas_2026-11-20.pdf */
+
     public String nombreSugerido(ReporteDiario reporte, ExportadorReporte exportador) {
         return "reporte_ventas_" + reporte.getFecha() + "." + exportador.extension();
     }

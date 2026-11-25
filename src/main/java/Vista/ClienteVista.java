@@ -4,6 +4,24 @@
  */
 package Vista;
 
+import LogicaNegocio.Carrito.CarritoException;
+import LogicaNegocio.Carrito.CarritoService;
+import LogicaNegocio.Moneda;
+import LogicaNegocio.Producto.Producto;
+import LogicaNegocio.Producto.ProductoService;
+import LogicaNegocio.Usuario;
+import LogicaNegocio.UsuarioService;
+import LogicaNegocio.Ventanas;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
+import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author jonap
@@ -12,11 +30,114 @@ public class ClienteVista extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ClienteVista.class.getName());
 
-    /**
-     * Creates new form ClienteVista
-     */
-    public ClienteVista() {
+    private static final String TODAS = "Todas";
+
+    private final Usuario cliente;
+    private final UsuarioService usuarioService;
+    private final ProductoService productoService;
+    private final CarritoService carritoService;
+
+    private final DefaultTableModel modelo = new DefaultTableModel(
+            new Object[][]{}, new String[]{"PRODUCTO", "STOCK", "PRECIO"}) {
+        @Override
+        public boolean isCellEditable(int fila, int columna) {
+            return false;
+        }
+    };
+    private List<Producto> productos = new ArrayList<>();
+
+    public ClienteVista(Usuario cliente, UsuarioService usuarioService,
+                        ProductoService productoService, CarritoService carritoService) {
+        this.cliente = cliente;
+        this.usuarioService = usuarioService;
+        this.productoService = productoService;
+        this.carritoService = carritoService;
         initComponents();
+        configurar();
+        setLocationRelativeTo(null);
+        cargarProductos();
+    }
+
+    // Todo lo que se agrega a mano va fuera de initComponents() para que el
+    // editor de NetBeans no lo borre al regenerar el formulario.
+    private void configurar() {
+        setTitle("Cliente - " + cliente.getNombre());
+
+        jTable1.setModel(modelo);
+        jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jTable1.getTableHeader().setReorderingAllowed(false);
+        jTable1.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                mostrarSeleccion();
+            }
+        });
+
+        // los campos PRODUCTO / PRECIO se llenan al elegir una fila de la tabla
+        EspacioProducto.setEditable(false);
+        EspacioPrecio.setEditable(false);
+
+        List<String> opciones = new ArrayList<>();
+        opciones.add(TODAS);
+        opciones.addAll(productoService.categorias());
+        FiltroProductos.setModel(new DefaultComboBoxModel<>(opciones.toArray(new String[0])));
+        FiltroProductos.addActionListener(e -> cargarProductos());
+
+        CarritoBoton.addActionListener(e -> new CarritoVista(this, carritoService).setVisible(true));
+        AGREGARCARRITO.addActionListener(this::AgregarCarritoActionPerformed);
+    }
+
+    private void cargarProductos() {
+        String categoria = (String) FiltroProductos.getSelectedItem();
+        if (categoria == null || TODAS.equals(categoria)) {
+            categoria = null;
+        }
+        productos = productoService.catalogo(categoria);
+        modelo.setRowCount(0);
+        for (Producto p : productos) {
+            modelo.addRow(new Object[]{p.getNombre(), p.getStock(), Moneda.pesos(p.getPrecio())});
+        }
+        mostrarSeleccion();
+    }
+
+    private void mostrarSeleccion() {
+        int fila = jTable1.getSelectedRow();
+        if (fila < 0 || fila >= productos.size()) {
+            EspacioProducto.setText("");
+            EspacioPrecio.setText("");
+            return;
+        }
+        Producto p = productos.get(fila);
+        EspacioProducto.setText(p.getNombre());
+        EspacioPrecio.setText(Moneda.pesos(p.getPrecio()));
+    }
+
+    private void AgregarCarritoActionPerformed(java.awt.event.ActionEvent evt) {
+        int fila = jTable1.getSelectedRow();
+        if (fila < 0) {
+            JOptionPane.showMessageDialog(this, "Selecciona un producto de la tabla.",
+                    "Tienda online", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        Producto producto = productos.get(fila);
+        JSpinner cantidad = new JSpinner(new SpinnerNumberModel(1, 1, 999, 1));
+        int r = JOptionPane.showConfirmDialog(this,
+                new Object[]{"¿Cuántas unidades de \"" + producto.getNombre() + "\"?", cantidad},
+                "Agregar al carrito", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (r != JOptionPane.OK_OPTION) {
+            return;
+        }
+        try {
+            cantidad.commitEdit();
+            carritoService.agregar(producto, ((Number) cantidad.getValue()).intValue());
+            JOptionPane.showMessageDialog(this, "Producto agregado al carrito.",
+                    "Tienda online", JOptionPane.INFORMATION_MESSAGE);
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(this, "Cantidad no válida.",
+                    "Tienda online", JOptionPane.WARNING_MESSAGE);
+        } catch (CarritoException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Tienda online", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     /**
@@ -167,37 +288,12 @@ public class ClienteVista extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void SalirBotonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SalirBotonActionPerformed
-        // TODO add your handling code here:
+        Ventanas.cerrarSesion(this, usuarioService);
     }//GEN-LAST:event_SalirBotonActionPerformed
 
     private void EspacioPrecioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EspacioPrecioActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_EspacioPrecioActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new ClienteVista().setVisible(true));
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AGREGARCARRITO;

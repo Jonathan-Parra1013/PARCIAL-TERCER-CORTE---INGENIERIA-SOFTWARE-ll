@@ -11,10 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Resultado del reporte de un día. Es "a prueba de vacío": si no hay ventas,
- * los valores nulos se convierten en 0.00, 0 pedidos y lista vacía.
- */
+
 public class ReporteDiario {
     private final LocalDate fecha;
     private final int numeroVentas;
@@ -36,17 +33,17 @@ public class ReporteDiario {
     public int getNumeroVentas() { return numeroVentas; }
     public BigDecimal getIngresosTotales() { return ingresosTotales; }
 
-    /** Todos los productos vendidos en el día (para el desglose del archivo). */
+
     public List<ProductoVendido> getProductosVendidos() { return productosVendidos; }
 
-    /** Los n productos más vendidos (para mostrar en pantalla). */
+
     public List<ProductoVendido> getTopProductos(int n) {
         return productosVendidos.subList(0, Math.min(Math.max(n, 0), productosVendidos.size()));
     }
 
     public boolean sinVentas() { return numeroVentas == 0; }
 
-    /** Ejemplo: "$0.00 / 0 pedidos" */
+
     public String resumen() {
         return dinero(ingresosTotales) + " / " + numeroVentas
                 + (numeroVentas == 1 ? " pedido" : " pedidos");

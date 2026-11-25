@@ -21,10 +21,6 @@ public class IngresarVista extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }
 
-    private IngresarVista() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
 
     public void setCorreo(String correo) {
         EspacioUsuario.setText(correo);
@@ -33,9 +29,10 @@ public class IngresarVista extends javax.swing.JFrame {
 
 
     private void abrirVentanaPrincipal(LogicaNegocio.Usuario usuario) {
-        javax.swing.JOptionPane.showMessageDialog(this,
-                "Bienvenido, " + usuario.getNombre() + " (" + usuario.getRol() + ")");
-        // TODO: abrir la ventana principal y luego cerrar el login con dispose();
+        // Ventanas decide qué pantalla abrir según el rol (cliente o vendedor)
+        if (LogicaNegocio.Ventanas.abrirPrincipal(usuario, usuarioService)) {
+            dispose(); // se cierra el login
+        }
     }
 
     /**

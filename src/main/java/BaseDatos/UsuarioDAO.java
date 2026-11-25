@@ -20,13 +20,21 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class UsuarioDAO implements LogicaNegocio.UsuarioRepositorio {
 
-    private final Connection con;
-
-    public UsuarioDAO() {
-        this.con = Conexion.getInstancia().getConexion();
+    // La conexión se pide en cada consulta y no al crear el DAO: así la ventana abre aunque MySQL
+    // esté apagado, y si se enciende después el siguiente intento funciona sin reiniciar la aplicación.
+    private Connection con() {
+        Conexion conexion = Conexion.getInstancia();
+        Connection c = conexion.getConexion();
+        if (c == null) {
+            throw new LogicaNegocio.BaseDatosException("No se pudo conectar con la base de datos.\n"
+                    + "Verifica que MySQL (XAMPP) esté encendido y que exista tienda_online_db.\n"
+                    + "Detalle: " + conexion.getUltimoError());
+        }
+        return c;
     }
 
     public boolean existeCorreo(String correo) {
+        Connection con = con();
         String sql = "SELECT id_usuario FROM usuarios WHERE correo = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, correo);
@@ -41,6 +49,7 @@ public class UsuarioDAO implements LogicaNegocio.UsuarioRepositorio {
 
     // creacion de cuenta de un usuario y se cifra la contraseña :b
     public boolean registrarUsuario(Usuario usuario) {
+        Connection con = con();
         if (existeCorreo(usuario.getEmail())) {
             return false;
         }
@@ -60,6 +69,7 @@ public class UsuarioDAO implements LogicaNegocio.UsuarioRepositorio {
 
     // inicio de sesion de cuentass
     public Usuario iniciarSesion(String correo, String contrasenaPlana) {
+        Connection con = con();
         String sql = "SELECT * FROM usuarios WHERE correo = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, correo);

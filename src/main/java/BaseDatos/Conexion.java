@@ -7,7 +7,6 @@ package BaseDatos;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -18,6 +17,7 @@ public class Conexion {
    
     private static Conexion instancia;
     private Connection conexion;
+    private String ultimoError; // por qué falló la conexión (null si todo bien)
 
     // datos para la conexion, de la base de datos local
     private static final String URL = "jdbc:mysql://localhost:3306/tienda_online_db?useSSL=false&serverTimezone=America/Bogota";
@@ -30,10 +30,10 @@ public class Conexion {
             conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
             System.out.println("Conexión exitosa a la base de datos.");
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, 
-                "Error al conectar con MySQL (XAMPP):\n" + e.getMessage(), 
-                "Error de Base de Datos", 
-                JOptionPane.ERROR_MESSAGE);
+            // Esta clase es de la capa de datos: no abre ventanas. El mensaje lo muestra la pantalla
+            // (UsuarioService lo convierte) usando getUltimoError().
+            ultimoError = e.getMessage();
+            System.err.println("Error al conectar con MySQL (XAMPP): " + e.getMessage());
         }
     }
 
@@ -51,5 +51,10 @@ public class Conexion {
 
     public Connection getConexion() {
         return conexion;
+    }
+
+    /** Motivo del último intento de conexión fallido; null si se conectó bien. */
+    public String getUltimoError() {
+        return ultimoError;
     }
 }

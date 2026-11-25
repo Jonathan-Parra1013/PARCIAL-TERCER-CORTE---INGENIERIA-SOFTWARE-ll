@@ -16,7 +16,12 @@ public class UsuarioService {
         if (correoLimpio.isEmpty() || clave == null || clave.isEmpty()) {
             throw new UsuarioException(null, "Ingresa tu correo y tu contraseña.");
         }
-        Usuario usuario = repositorio.iniciarSesion(correoLimpio, clave);
+        Usuario usuario;
+        try {
+            usuario = repositorio.iniciarSesion(correoLimpio, clave);
+        } catch (BaseDatosException e) {
+            throw new UsuarioException(null, e.getMessage());
+        }
         if (usuario == null) {
             throw new UsuarioException(null, "Correo o contraseña incorrectos.");
         }
@@ -46,12 +51,16 @@ public class UsuarioService {
         if (!ROL_CLIENTE.equals(rol) && !ROL_VENDEDOR.equals(rol)) {
             throw new UsuarioException("rol", "Selecciona un tipo de cuenta válido.");
         }
-        if (repositorio.existeCorreo(correoLimpio)) {
-            throw new UsuarioException("correo", "Ya existe una cuenta con ese correo.");
-        }
-        // el DAO cifra la contraseña con BCrypt antes de guardarla
-        if (!repositorio.registrarUsuario(new Usuario(0, nombreLimpio, correoLimpio, clave, rol))) {
-            throw new UsuarioException(null, "No se pudo crear la cuenta. Revisa la conexión con la base de datos.");
+        try {
+            if (repositorio.existeCorreo(correoLimpio)) {
+                throw new UsuarioException("correo", "Ya existe una cuenta con ese correo.");
+            }
+            // el DAO cifra la contraseña con BCrypt antes de guardarla
+            if (!repositorio.registrarUsuario(new Usuario(0, nombreLimpio, correoLimpio, clave, rol))) {
+                throw new UsuarioException(null, "No se pudo crear la cuenta. Revisa la conexión con la base de datos.");
+            }
+        } catch (BaseDatosException e) {
+            throw new UsuarioException(null, e.getMessage());
         }
     }
 }
