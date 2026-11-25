@@ -10,13 +10,32 @@ package GUI;
  */
 public class IngresarVista extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(IngresarVista.class.getName());
+     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(IngresarVista.class.getName());
 
-    /**
-     * Creates new form IngresarVista
-     */
-    public IngresarVista() {
+ 
+    private final LogicaNegocio.UsuarioService usuarioService;
+
+    public IngresarVista(LogicaNegocio.UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
         initComponents();
+        setLocationRelativeTo(null);
+    }
+
+    private IngresarVista() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+
+    public void setCorreo(String correo) {
+        EspacioUsuario.setText(correo);
+        EspacioPassword.setText("");
+    }
+
+
+    private void abrirVentanaPrincipal(LogicaNegocio.Usuario usuario) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+                "Bienvenido, " + usuario.getNombre() + " (" + usuario.getRol() + ")");
+        // TODO: abrir la ventana principal y luego cerrar el login con dispose();
     }
 
     /**
@@ -31,13 +50,13 @@ public class IngresarVista extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        EspacioUsuario = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        EspacioPassword = new javax.swing.JTextField();
+        BotonEntrar = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        BotonCrearCuenta = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -47,19 +66,21 @@ public class IngresarVista extends javax.swing.JFrame {
 
         jLabel2.setText("Inicio de Sesion");
 
-        jTextField1.addActionListener(this::jTextField1ActionPerformed);
+        EspacioUsuario.addActionListener(this::EspacioUsuarioActionPerformed);
 
         jLabel3.setText("USUARIO");
 
         jLabel4.setText("CONTRASEÑA");
 
-        jButton1.setText("ENTRAR");
-        jButton1.addActionListener(this::jButton1ActionPerformed);
+        EspacioPassword.addActionListener(this::EspacioPasswordActionPerformed);
+
+        BotonEntrar.setText("ENTRAR");
+        BotonEntrar.addActionListener(this::BotonEntrarActionPerformed);
 
         jLabel5.setText("NO TENGO CUENTA:");
 
-        jButton2.setText("REGISTRAR");
-        jButton2.addActionListener(this::jButton2ActionPerformed);
+        BotonCrearCuenta.setText("REGISTRAR");
+        BotonCrearCuenta.addActionListener(this::BotonCrearCuentaActionPerformed);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -76,7 +97,7 @@ public class IngresarVista extends javax.swing.JFrame {
                         .addGap(156, 156, 156))))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(EspacioPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel1Layout.createSequentialGroup()
                             .addGap(175, 175, 175)
@@ -86,19 +107,19 @@ public class IngresarVista extends javax.swing.JFrame {
                             .addComponent(jLabel3))
                         .addGroup(jPanel1Layout.createSequentialGroup()
                             .addGap(111, 111, 111)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(EspacioUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(114, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(158, 158, 158)
-                        .addComponent(jButton1))
+                        .addComponent(BotonEntrar))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(6, 6, 6)
-                                .addComponent(jButton2))
+                                .addComponent(BotonCrearCuenta))
                             .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
@@ -112,17 +133,17 @@ public class IngresarVista extends javax.swing.JFrame {
                 .addGap(30, 30, 30)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(EspacioUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel4)
                 .addGap(18, 18, 18)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(EspacioPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(31, 31, 31)
-                .addComponent(jButton1)
+                .addComponent(BotonEntrar)
                 .addGap(36, 36, 36)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
+                .addComponent(BotonCrearCuenta)
                 .addContainerGap(18, Short.MAX_VALUE))
         );
 
@@ -142,17 +163,30 @@ public class IngresarVista extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    private void EspacioUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EspacioUsuarioActionPerformed
+        EspacioPassword.requestFocusInWindow();
+    }//GEN-LAST:event_EspacioUsuarioActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void BotonEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonEntrarActionPerformed
+        try {
+            LogicaNegocio.Usuario usuario = usuarioService.iniciarSesion(
+                    EspacioUsuario.getText(), EspacioPassword.getText());
+            abrirVentanaPrincipal(usuario);
+        } catch (LogicaNegocio.UsuarioException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(), "Tienda online",
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+            EspacioPassword.setText("");
+        }
+    }//GEN-LAST:event_BotonEntrarActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void BotonCrearCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonCrearCuentaActionPerformed
+        setVisible(false);
+        new CrearCuenta(usuarioService, this).setVisible(true);
+    }//GEN-LAST:event_BotonCrearCuentaActionPerformed
+
+    private void EspacioPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EspacioPasswordActionPerformed
+        BotonEntrar.doClick();
+    }//GEN-LAST:event_EspacioPasswordActionPerformed
 
     /**
      * @param args the command line arguments
@@ -176,19 +210,20 @@ public class IngresarVista extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new IngresarVista().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new IngresarVista(
+                new LogicaNegocio.UsuarioService(new BaseDatos.UsuarioDAO())).setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton BotonCrearCuenta;
+    private javax.swing.JButton BotonEntrar;
+    private javax.swing.JTextField EspacioPassword;
+    private javax.swing.JTextField EspacioUsuario;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
 }

@@ -18,7 +18,7 @@ import java.sql.SQLException;
 import org.mindrot.jbcrypt.BCrypt;
 
 
-public class UsuarioDAO {
+public class UsuarioDAO implements LogicaNegocio.UsuarioRepositorio {
 
     private final Connection con;
 
@@ -26,7 +26,6 @@ public class UsuarioDAO {
         this.con = Conexion.getInstancia().getConexion();
     }
 
-    // RF-01: Verificar si el correo ya existe
     public boolean existeCorreo(String correo) {
         String sql = "SELECT id_usuario FROM usuarios WHERE correo = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
