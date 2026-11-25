@@ -45,6 +45,7 @@ public class ClienteVista extends javax.swing.JFrame {
         }
     };
     private List<Producto> productos = new ArrayList<>();
+    private CarritoVista ventanaCarrito; // la ventana del carrito (una sola a la vez)
 
     public ClienteVista(Usuario cliente, UsuarioService usuarioService,
                         ProductoService productoService, CarritoService carritoService) {
@@ -82,8 +83,26 @@ public class ClienteVista extends javax.swing.JFrame {
         FiltroProductos.setModel(new DefaultComboBoxModel<>(opciones.toArray(new String[0])));
         FiltroProductos.addActionListener(e -> cargarProductos());
 
-        CarritoBoton.addActionListener(e -> new CarritoVista(this, carritoService).setVisible(true));
+        CarritoBoton.addActionListener(e -> abrirCarrito());
         AGREGARCARRITO.addActionListener(this::AgregarCarritoActionPerformed);
+    }
+
+    // El carrito es una ventana propia y no modal: se abre una sola, y si ya está abierta se trae al frente
+    private void abrirCarrito() {
+        if (ventanaCarrito == null || !ventanaCarrito.isDisplayable()) {
+            ventanaCarrito = new CarritoVista(this, carritoService);
+        }
+        ventanaCarrito.setVisible(true);
+        ventanaCarrito.toFront();
+    }
+
+    // al cerrar sesión o cerrar esta ventana no debe quedar el carrito abierto
+    @Override
+    public void dispose() {
+        if (ventanaCarrito != null) {
+            ventanaCarrito.dispose();
+        }
+        super.dispose();
     }
 
     private void cargarProductos() {
