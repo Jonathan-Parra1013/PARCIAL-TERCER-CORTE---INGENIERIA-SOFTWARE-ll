@@ -6,8 +6,11 @@ import LogicaNegocio.UsuarioService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ReporteService {
@@ -22,11 +25,52 @@ public class ReporteService {
         this.repositorio = repositorio;
     }
 
+    /** Reporte del día como texto. Mantiene la firma de siempre. */
     public String generarReporteDiario(Usuario vendedor, LocalDate dia) {
-        if (vendedor == null || !UsuarioService.ROL_VENDEDOR.equalsIgnoreCase(vendedor.getRol())) {
-            throw new ReporteException("Solo los vendedores pueden generar el reporte.");
-        }
+        return generarTexto(vendedor, reporteDiario(vendedor, dia));
+    }
+
+    /**
+     * Datos del reporte del día (ventas de los productos del vendedor), listos para
+     * mostrarse como texto o exportarse a CSV / PDF. Hace una sola consulta.
+     */
+    public ReporteDiario reporteDiario(Usuario vendedor, LocalDate dia) {
+        validarVendedor(vendedor);
         List<LineaVenta> lineas = repositorio.listarVentasDelDia(vendedor.getId(), dia);
+
+        Set<Integer> pedidos = new HashSet<>();
+        BigDecimal total = BigDecimal.ZERO;
+        Map<String, Long> unidadesPorProducto = new HashMap<>();
+        Map<String, BigDecimal> ingresosPorProducto = new HashMap<>();
+
+        for (LineaVenta l : lineas) {
+            pedidos.add(l.getIdPedido());
+            total = total.add(l.getSubtotal());
+            unidadesPorProducto.merge(l.getProducto(), (long) l.getCantidad(), Long::sum);
+            ingresosPorProducto.merge(l.getProducto(), l.getSubtotal(), BigDecimal::add);
+        }
+
+        List<ProductoVendido> productos = new ArrayList<>();
+        for (Map.Entry<String, Long> e : unidadesPorProducto.entrySet()) {
+            productos.add(new ProductoVendido(e.getKey(), e.getValue(), ingresosPorProducto.get(e.getKey())));
+        }
+        // de mayor a menor cantidad; si empatan, por ingresos y luego por nombre
+        productos.sort((a, b) -> {
+            int c = Long.compare(b.getUnidades(), a.getUnidades());
+            if (c == 0) {
+                c = b.getIngresos().compareTo(a.getIngresos());
+            }
+            return c != 0 ? c : a.getNombre().compareToIgnoreCase(b.getNombre());
+        });
+
+        return new ReporteDiario(dia, vendedor.getNombre(), pedidos.size(), total, productos, lineas);
+    }
+
+    /** Convierte los datos del reporte en el texto que se muestra en pantalla. */
+    public String generarTexto(Usuario vendedor, ReporteDiario datos) {
+        validarVendedor(vendedor);
+        LocalDate dia = datos.getFecha();
+        List<LineaVenta> lineas = datos.getLineas();
 
         StringBuilder sb = new StringBuilder();
         sb.append("REPORTE DIARIO DE COMPRAS\n");
@@ -71,6 +115,12 @@ public class ReporteService {
         sb.append("Total vendido:      ").append(Moneda.pesos(total)).append('\n');
         sb.append("(Valores antes de los descuentos aplicados al pedido.)\n");
         return sb.toString();
+    }
+
+    private static void validarVendedor(Usuario vendedor) {
+        if (vendedor == null || !UsuarioService.ROL_VENDEDOR.equalsIgnoreCase(vendedor.getRol())) {
+            throw new ReporteException("Solo los vendedores pueden generar el reporte.");
+        }
     }
 
     private static String recortar(String texto, int max) {

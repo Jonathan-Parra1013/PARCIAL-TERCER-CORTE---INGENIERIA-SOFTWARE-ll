@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -14,6 +15,7 @@ public class ExportadorPDF implements ExportadorReporte {
 
     private static final int LINEAS_POR_PAGINA = 45;
     private static final Charset CP1252 = Charset.forName("windows-1252");
+    private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm");
 
     @Override
     public String extension() { return "pdf"; }
@@ -26,10 +28,16 @@ public class ExportadorPDF implements ExportadorReporte {
     private List<String> construirLineas(ReporteDiario r) {
         List<String> l = new ArrayList<>();
         l.add("REPORTE DE VENTAS DEL DÍA");
+        if (r.getVendedor() != null) {
+            l.add("Vendedor: " + r.getVendedor());
+        }
         l.add("Fecha: " + r.getFecha());
         l.add("");
         l.add("Ingresos totales: " + ReporteDiario.dinero(r.getIngresosTotales()));
         l.add("Número de ventas: " + r.getNumeroVentas());
+        if (r.getVendedor() != null) {
+            l.add("(Valores antes de los descuentos aplicados al pedido.)");
+        }
         l.add("");
         l.add("Productos vendidos (de mayor a menor)");
         if (r.getProductosVendidos().isEmpty()) {
@@ -40,6 +48,23 @@ public class ExportadorPDF implements ExportadorReporte {
                 l.add(cortar(i + ". " + p.getNombre(), 50) + "   x" + p.getUnidades()
                         + "   " + ReporteDiario.dinero(p.getIngresos()));
                 i++;
+            }
+        }
+
+        // detalle por pedido (solo si el reporte trae las líneas de venta)
+        if (!r.getLineas().isEmpty()) {
+            l.add("");
+            l.add("Detalle por pedido");
+            int pedidoActual = -1;
+            for (LineaVenta v : r.getLineas()) {
+                if (v.getIdPedido() != pedidoActual) {
+                    pedidoActual = v.getIdPedido();
+                    l.add("Pedido #" + v.getIdPedido() + "  " + v.getFecha().format(HORA)
+                            + "  " + cortar(v.getCliente(), 30));
+                    l.add("   " + v.getMedioPago().getEtiqueta() + " - " + v.getEstado().getEtiqueta());
+                }
+                l.add("   " + v.getCantidad() + " x " + cortar(v.getProducto(), 36)
+                        + "   " + ReporteDiario.dinero(v.getSubtotal()));
             }
         }
         return l;

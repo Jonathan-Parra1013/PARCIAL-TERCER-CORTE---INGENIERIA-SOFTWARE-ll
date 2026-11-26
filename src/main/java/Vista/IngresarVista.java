@@ -65,7 +65,7 @@ public class IngresarVista extends javax.swing.JFrame {
 
         EspacioUsuario.addActionListener(this::EspacioUsuarioActionPerformed);
 
-        jLabel3.setText("USUARIO");
+        jLabel3.setText("CORREO");
 
         jLabel4.setText("CONTRASEÑA");
 
